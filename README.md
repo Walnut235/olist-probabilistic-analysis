@@ -28,10 +28,10 @@ olist-probabilistic-analysis/
 │   ├── raw/                        
 │   └── processed/                  
 ├── notebooks/
-│   └── 01_analisis_olist.ipynb     # Notebook principal: carga, limpieza y los 11 conceptos
+│   └── 01_analisis_olist.ipynb     
 ├── reports/
-│   ├── informe_gerencial.pdf       # Informe ejecutivo (máx. 2 páginas)
-│   └── figuras/                    # Gráficos exportados de cada concepto
+│   ├── informe_gerencial.pdf       
+│   └── figuras/                    
 ├── src/                             
 └── README.md
 ```
