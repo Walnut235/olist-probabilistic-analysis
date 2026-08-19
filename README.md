@@ -17,6 +17,7 @@ Preguntas centrales que guían el análisis:
 **Brazilian E-Commerce Public Dataset by Olist** (Kaggle) — más de 99.000 pedidos reales (2016–2018), distribuidos en 9 archivos CSV relacionados (clientes, pedidos, ítems, productos, vendedores, pagos, reseñas y geolocalización).
 
 - Fuente: https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
+- **Versión utilizada:** versión 2 (126.19 MB), descargada el 18 de agosto de 2026
 - El dataset se descarga bajo demanda con `kagglehub` dentro del notebook (no se versiona en este repositorio; ver `.gitignore`).
 
 ## Estructura del repositorio
