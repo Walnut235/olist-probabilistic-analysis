@@ -24,43 +24,100 @@ Preguntas centrales que guían el análisis:
 ```
 olist-probabilistic-analysis/
 ├── data/
-│   ├── raw/            
-│   └── processed/      
+│   ├── raw/                        
+│   └── processed/                  
 ├── notebooks/
-│   └── 01_analisis_olist.ipynb   # Notebook principal: carga, limpieza y análisis
-├── reports/             # Gráficos y resúmenes generados para el informe gerencial
-├── src/                 # Funciones auxiliares reutilizables (si aplica)
+│   └── 01_analisis_olist.ipynb     # Notebook principal: carga, limpieza y los 11 conceptos
+├── reports/
+│   ├── informe_gerencial.pdf       # Informe ejecutivo (máx. 2 páginas)
+│   └── figuras/                    # Gráficos exportados de cada concepto
+├── src/                             
 └── README.md
 ```
 
-## Metodología 
+## Metodología
 
+**Preparación de datos**
 1. **Carga y unión de tablas**: se construye un `df_master` a nivel pedido-producto mediante `merge` progresivos (customers → items → products → sellers → traducción de categoría), usando joins `left` para conservar los 99.441 pedidos originales.
-2. **Selección de variables**: se define `df_analysis` con las ~14 variables relevantes para la Propuesta A (pagos y reseñas se agregan aparte por `order_id` para no alterar la granularidad).
+2. **Selección de variables**: se define `df_analysis` con las ~14 variables relevantes para la Propuesta A.
 3. **Limpieza documentada**: cada valor faltante se trata según su causa (no se aplica `dropna()` global). Se documentan además dos inconsistencias del dataset original: pedidos `delivered` sin fecha de entrega, y pedidos `canceled` con fecha de entrega registrada.
 4. **Variable derivada `retrasado`**: clasifica un pedido como tardío/a tiempo solo cuando fue efectivamente entregado y tiene fecha real; en cualquier otro caso queda como no clasificable (`NaN`), evitando inferencias sin evidencia.
 5. **Validación de duplicados y consistencia**: revisión de filas duplicadas, coherencia cronológica de fechas y rangos válidos.
+6. **`payments` y `reviews` sin fusión global**: ambas tablas se mantienen separadas de `df_clean` (un pedido puede tener varios métodos de pago o más de una reseña). Cada concepto que las necesita hace su propio *join puntual*, documentando en el momento cómo maneja esa multiplicidad, en vez de forzar una sola tabla agregada para todo el proyecto.
+
+**Los 11 conceptos aplicados**
+
+| # | Concepto | Pregunta de negocio |
+|---|---|---|
+| 1 | Probabilidad condicional | ¿La demora en la entrega se asocia con reseñas negativas? |
+| 2 | Teorema de Bayes | Dado una reseña negativa, ¿qué tan probable es que el pedido haya llegado tarde? |
+| 3 | Verosimilitud / MLE | ¿Qué distribución describe mejor el tiempo de entrega? (Log-Normal vs. Gamma) |
+| 4 | Distribuciones paramétricas | ¿Qué distribución describe mejor el peso del producto? |
+| 5 | Esperanza y varianza | Ticket promedio y variabilidad por categoría |
+| 6 | Independencia y correlación | ¿Método de pago y categoría son independientes? ¿Correlación entrega–calificación? |
+| 7 | Prior y posterior | Confiabilidad de un vendedor nuevo (Beta-Binomial) |
+| 8 | Entropía | Diversidad del catálogo de categorías de producto |
+| 9 | Entropía cruzada | Regresión logística prediciendo reseña negativa |
+| 10 | Divergencia KL | Diferencia en distribución de calificaciones entre estados |
 
 ## Estado actual
 
 - [x] Carga y unión de tablas (`df_master`)
-- [x] Selección de variables relevantes (`df_analysis`)
+- [x] Selección de variables relevantes (`df_analysis` → `df_clean`)
 - [x] Limpieza de valores faltantes y documentación de inconsistencias
 - [x] Variable derivada `retrasado`
 - [x] Validación de duplicados y consistencia
-- [ ] Incorporación de `payments` y `reviews` agregados por pedido
-- [ ] Aplicación de los 11 conceptos probabilísticos
-- [ ] Informe gerencial y hallazgos finales
+- [x] Estrategia de join puntual para `payments` y `reviews` (sin fusión global)
+- [x] Los 11 conceptos probabilísticos desarrollados y verificados en el notebook
+- [x] Revisión y corrección de errores de lógica/código detectados en el pipeline
+- [x] Verificación final de resultados tras las correcciones
+- [ ] Informe gerencial
 
 ## Cómo reproducir
 
 1. Abrir `notebooks/01_analisis_olist.ipynb` en Google Colab (o localmente con Jupyter).
-2. Ejecutar las celdas en orden; la primera descarga el dataset automáticamente desde Kaggle vía `kagglehub` (requiere cuenta gratuita de Kaggle).
+2. Ejecutar las celdas en orden (Entorno de ejecución → Ejecutar todas); la primera descarga el dataset automáticamente desde Kaggle vía `kagglehub` (requiere cuenta gratuita de Kaggle).
 3. No se requiere colocar archivos manualmente en `data/` — el pipeline es autocontenido.
 
 ## Hallazgos clave
 
-*(Sección en construcción — se completará a medida que se desarrollen los 11 conceptos probabilísticos sobre el dataset limpio.)*
+### 1 — Probabilidad condicional
+P(reseña ≤ 2★ | pedido tardío) = **54.03%** — más de la mitad de las reseñas asociadas a pedidos que llegaron tarde son negativas.
+
+### 2 — Teorema de Bayes
+P(pedido tardío | reseña ≤ 2★) = **33.70%**, frente a una tasa base de pedidos tardíos de solo 7.99% — un pedido con reseña negativa tiene una probabilidad de haber llegado tarde más de 4 veces mayor que un pedido cualquiera. Evidencia de asociación fuerte, aunque el retraso no es el único factor detrás de una mala calificación.
+
+
+### 3 — Verosimilitud / MLE
+La distribución **Log-Normal** describe mejor el tiempo de entrega que la Gamma (log-verosimilitud −367.232,75 vs. −369.334,95; AIC/BIC consistentemente menores), coherente con un proceso logístico de etapas encadenadas de forma multiplicativa.
+![alt text](concepto03_ajuste_tiempo_entrega-1.png)
+
+### 4 — Distribuciones paramétricas
+La **Log-Normal** también es la que mejor ajusta el peso del producto entre las 4 candidatas evaluadas (Log-Normal, Weibull, Gamma, Exponencial), ganando en AIC, KS y Chi² de forma consistente.
+![alt text](concepto04_ajuste_peso_top3-1.png)
+
+### 5 — Esperanza y varianza
+Las categorías con mayor varianza (mayor "riesgo" en el valor del ítem) son **`pcs`** (computadores), **`portateis_casa_forno_e_cafe`** y **`eletrodomesticos_2`** — productos de electrónica/electrodomésticos de alto valor, donde el ticket promedio es alto pero también muy disperso, a diferencia de categorías de bajo valor y baja varianza.
+
+### 6 — Independencia y correlación
+- **Independencia:** χ² = 566,24, p ≈ 1,78×10⁻⁸³, gl = 60 → se rechaza H₀: método de pago y categoría de producto **no son independientes**.
+- **Correlación:** ρ de Spearman = **−0,221** entre tiempo de entrega y calificación — relación negativa débil (a mayor tiempo de entrega, calificación ligeramente menor).
+
+### 7 — Prior y posterior
+Tasa global de entregas a tiempo (prior poblacional): **91,98%**. Se actualiza a un posterior Beta individual por vendedor con sus primeras 10 ventas, permitiendo estimar `P(θ > 0.9)` (confiabilidad) incluso con poca evidencia por vendedor.
+
+![alt text](concepto07_prior_posterior_vendedores-1.png)
+
+### 8 — Entropía
+La entropía normalizada de las categorías de producto es **76,73%** de la máxima teórica — un catálogo con diversidad moderada-alta, sin dependencia extrema de 2-3 categorías, pero tampoco perfectamente uniforme.
+
+
+### 9 — Entropía cruzada
+Un modelo de regresión logística prediciendo reseña negativa a partir de `tardio`, `payment_value` y `payment_installments` obtiene entropía cruzada de **0,3368** en entrenamiento y **0,3391** en prueba — valores muy cercanos, sin señales de sobreajuste.
+
+### 10 — Divergencia KL
+La diferencia en distribución de calificaciones entre São Paulo y Río de Janeiro es baja (D_KL(SP‖RJ) = **0,0247**, D_KL(RJ‖SP) = **0,0291**) — percepción de calidad prácticamente equivalente entre los dos mercados más grandes de Olist.
+![alt text](concepto10_calificaciones_sp_rj-1.png)
 
 ## Referencias
 
