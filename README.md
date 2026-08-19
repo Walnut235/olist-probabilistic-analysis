@@ -90,11 +90,17 @@ P(pedido tardío | reseña ≤ 2★) = **33.70%**, frente a una tasa base de ped
 
 ### 3 — Verosimilitud / MLE
 La distribución **Log-Normal** describe mejor el tiempo de entrega que la Gamma (log-verosimilitud −367.232,75 vs. −369.334,95; AIC/BIC consistentemente menores), coherente con un proceso logístico de etapas encadenadas de forma multiplicativa.
-![alt text](concepto03_ajuste_tiempo_entrega-1.png)
+
+<p align="center">
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/c2c9e61e-0dab-4e47-9c43-2725517e4df5" />
+</p>
 
 ### 4 — Distribuciones paramétricas
 La **Log-Normal** también es la que mejor ajusta el peso del producto entre las 4 candidatas evaluadas (Log-Normal, Weibull, Gamma, Exponencial), ganando en AIC, KS y Chi² de forma consistente.
-![alt text](concepto04_ajuste_peso_top3-1.png)
+
+<p align="center">
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/8a2ae114-5116-47ea-aa61-c56fcefcc027" />
+</p>
 
 ### 5 — Esperanza y varianza
 Las categorías con mayor varianza (mayor "riesgo" en el valor del ítem) son **`pcs`** (computadores), **`portateis_casa_forno_e_cafe`** y **`eletrodomesticos_2`** — productos de electrónica/electrodomésticos de alto valor, donde el ticket promedio es alto pero también muy disperso, a diferencia de categorías de bajo valor y baja varianza.
@@ -106,7 +112,9 @@ Las categorías con mayor varianza (mayor "riesgo" en el valor del ítem) son **
 ### 7 — Prior y posterior
 Tasa global de entregas a tiempo (prior poblacional): **91,98%**. Se actualiza a un posterior Beta individual por vendedor con sus primeras 10 ventas, permitiendo estimar `P(θ > 0.9)` (confiabilidad) incluso con poca evidencia por vendedor.
 
-![alt text](concepto07_prior_posterior_vendedores-1.png)
+<p align="center">
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/babd9ce9-7f1c-4ca2-9ab4-8d09f9bf664c" />
+</p>
 
 ### 8 — Entropía
 La entropía normalizada de las categorías de producto es **76,73%** de la máxima teórica — un catálogo con diversidad moderada-alta, sin dependencia extrema de 2-3 categorías, pero tampoco perfectamente uniforme.
@@ -117,7 +125,10 @@ Un modelo de regresión logística prediciendo reseña negativa a partir de `tar
 
 ### 10 — Divergencia KL
 La diferencia en distribución de calificaciones entre São Paulo y Río de Janeiro es baja (D_KL(SP‖RJ) = **0,0247**, D_KL(RJ‖SP) = **0,0291**) — percepción de calidad prácticamente equivalente entre los dos mercados más grandes de Olist.
-![alt text](concepto10_calificaciones_sp_rj-1.png)
+
+<p align="center">
+  <img width="700" alt="image" src="https://github.com/user-attachments/assets/06b77a12-1de2-4336-89cf-ccb1d89d5047" />
+</p>
 
 ## Referencias
 
