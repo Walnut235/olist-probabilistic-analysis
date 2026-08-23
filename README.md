@@ -71,7 +71,7 @@ olist-probabilistic-analysis/
 - [x] Los 11 conceptos probabilísticos desarrollados y verificados en el notebook
 - [x] Revisión y corrección de errores de lógica/código detectados en el pipeline
 - [x] Verificación final de resultados tras las correcciones
-- [ ] Informe gerencial
+- [x] Informe gerencial
 
 ## Cómo reproducir
 
