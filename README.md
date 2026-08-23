@@ -31,8 +31,7 @@ olist-probabilistic-analysis/
 │   └── 01_analisis_olist.ipynb     
 ├── reports/
 │   ├── informe_gerencial.pdf       
-│   └── figuras/                    
-├── src/                             
+│   └── figuras/                                                
 └── README.md
 ```
 
